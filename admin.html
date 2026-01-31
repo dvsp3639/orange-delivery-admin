@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orange Restaurant - Admin Panel</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #ff7a00;
+            --primary-dark: #d56700;
+            --bg: #f5f5f7;
+            --card-bg: #ffffff;
+            --text: #111;
+            --text-light: #555;
+            --border: #e5e5e5;
+            --radius: 12px;
+            --shadow: 0 2px 12px rgba(0,0,0,0.08);
+            --success: #4CAF50;
+            --warning: #ff9800;
+            --danger: #ff4444;
+            --info: #2196F3;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .logo i {
+            font-size: 2.2rem;
+        }
+
+        .subtitle {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border-left: 4px solid var(--primary);
+        }
+
+        .stat-card h3 {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-card .value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .admin-actions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            border: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .action-btn.save {
+            background: var(--success);
+            color: white;
+        }
+
+        .action-btn.reset {
+            background: var(--danger);
+            color: white;
+        }
+
+        .action-btn.export {
+            background: var(--info);
+            color: white;
+        }
+
+        .action-btn.back {
+            background: #666;
+            color: white;
+        }
+
+        .action-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .search-box {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 45px 12px 15px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.95rem;
+        }
+
+        .search-box i {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .filter-btn.active {
+            background: var(--text);
+            color: white;
+            border-color: var(--text);
+        }
+
+        .filter-btn:hover:not(.active) {
+            border-color: var(--primary);
+        }
+
+        /* Category Sections */
+        .category-section {
+            margin-bottom: 30px;
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .category-header {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .category-header:hover {
+            background: #f0f0f0;
+        }
+
+        .category-header.collapsed {
+            border-bottom: none;
+        }
+
+        .category-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .category-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .category-icon {
+            color: var(--primary);
+        }
+
+        .category-stats {
+            display: flex;
+            gap: 15px;
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+
+        .category-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .category-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toggle-text {
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--success);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .category-content {
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .category-content.collapsed {
+            display: none;
+        }
+
+        .menu-item-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            transition: all 0.3s;
+        }
+
+        .menu-item-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .menu-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .menu-item-name {
+            font-weight: 600;
+            font-size: 1rem;
+            flex: 1;
+        }
+
+        .menu-item-price {
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .menu-item-description {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+
+        .menu-item-meta {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .menu-item-badge {
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .badge-category {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .badge-recommended {
+            background: #fff3e0;
+            color: #ff9800;
+        }
+
+        .badge-customizable {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        .badge-inactive {
+            background: #f5f5f5;
+            color: #757575;
+        }
+
+        .menu-item-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border);
+        }
+
+        .item-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-light);
+            grid-column: 1 / -1;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: #e5e5e5;
+        }
+
+        .notification-area {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 350px;
+        }
+
+        .notification {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: slideIn 0.3s ease;
+            border-left: 4px solid var(--primary);
+        }
+
+        .notification.success {
+            border-left-color: var(--success);
+        }
+
+        .notification.warning {
+            border-left-color: var(--warning);
+        }
+
+        .notification.info {
+            border-left-color: var(--info);
+        }
+
+        .notification.danger {
+            border-left-color: var(--danger);
+        }
+
+        .notification-icon {
+            font-size: 1.2rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        .notification.success .notification-icon {
+            color: var(--success);
+        }
+
+        .notification.warning .notification-icon {
+            color: var(--warning);
+        }
+
+        .notification.info .notification-icon {
+            color: var(--info);
+        }
+
+        .notification.danger .notification-icon {
+            color: var(--danger);
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-title {
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+
+        .notification-message {
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        .notification-close {
+            background: none;
+            border: none;
+            color: var(--text-light);
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 0;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .notification-close:hover {
+            background: rgba(0,0,0,0.05);
+        }
+
+        @media (max-width: 768px) {
+            .category-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .dashboard-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .notification-area {
+                max-width: 90%;
+                left: 20px;
+                right: 20px;
+            }
+            
+            .category-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .category-controls {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <i class="fas fa-utensils"></i>
+            <span>Orange Restaurant</span>
+        </div>
+        <p class="subtitle">Admin Panel - Menu Management</p>
+    </header>
+
+    <div class="dashboard-header">
+        <div>
+            <h1 style="margin-bottom: 5px;">Menu Management</h1>
+            <p style="color: var(--text-light); font-size: 0.9rem;">Manage menu items, prices, and availability</p>
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <button class="action-btn back" onclick="window.location.href='https://order.orange-foods.info'">
+                <i class="fas fa-home"></i> Menu
+            </button>
+            <button class="action-btn back" onclick="window.location.href='https://dashboard.orange-foods.info'">
+                <i class="fas fa-clipboard-list"></i> Orders
+            </button>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card" id="totalItems">
+            <h3>Total Items</h3>
+            <div class="value">0</div>
+        </div>
+        <div class="stat-card" id="activeItems">
+            <h3>Active Items</h3>
+            <div class="value">0</div>
+        </div>
+        <div class="stat-card" id="inactiveItems">
+            <h3>Inactive Items</h3>
+            <div class="value">0</div>
+        </div>
+        <div class="stat-card" id="recommendedItems">
+            <h3>Recommended</h3>
+            <div class="value">0</div>
+        </div>
+    </div>
+
+    <div class="admin-actions">
+        <button class="action-btn save" id="saveBtn">
+            <i class="fas fa-cloud-upload-alt"></i> Save to Cloud
+        </button>
+        <button class="action-btn reset" id="resetBtn">
+            <i class="fas fa-redo"></i> Reset to Original
+        </button>
+        <button class="action-btn export" id="exportBtn">
+            <i class="fas fa-file-export"></i> Export CSV
+        </button>
+    </div>
+
+    <div class="search-box">
+        <input type="text" id="searchBox" placeholder="Search menu items...">
+        <i class="fas fa-search"></i>
+    </div>
+
+    <div class="filter-tabs">
+        <button class="filter-btn active" data-filter="all">All Items</button>
+        <button class="filter-btn" data-filter="active">Active Only</button>
+        <button class="filter-btn" data-filter="inactive">Inactive Only</button>
+        <button class="filter-btn" data-filter="recommended">Recommended</button>
+    </div>
+
+    <div id="categoriesContainer">
+        <!-- Categories will be loaded here -->
+    </div>
+
+    <!-- Notification Container -->
+    <div class="notification-area" id="notificationArea"></div>
+
+    <!-- Add Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    
+    <script src="menu-data-new.js"></script>
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDrCUl3vY2ZeQ1UrbQREnvTUImNVabYcg4",
+            authDomain: "orange-delivery-db.firebaseapp.com",
+            projectId: "orange-delivery-db",
+            storageBucket: "orange-delivery-db.firebasestorage.app",
+            messagingSenderId: "185759993186",
+            appId: "1:185759993186:web:69677777698186e05d303b"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // Collections
+        const MENU_ITEMS_COLLECTION = "menuItems";
+        const CATEGORIES_DOC = "categories";
+
+        let currentMenuItems = [];
+        let filteredItems = [];
+        let currentFilter = 'all';
+        let currentSearch = '';
+        let collapsedCategories = {};
+
+        // Initialize default data if needed
+        async function initializeFirebaseData() {
+            try {
+                // Check if menu items exist
+                const menuItemsSnapshot = await db.collection(MENU_ITEMS_COLLECTION).limit(1).get();
+                if (menuItemsSnapshot.empty) {
+                    console.log("Initializing Firebase with default menu items...");
+                    
+                    const batch = db.batch();
+                    
+                    // Use the menuItems array from menu-data-new.js
+                    window.menuItems.forEach(item => {
+                        const docRef = db.collection(MENU_ITEMS_COLLECTION).doc(item.id.toString());
+                        const itemData = { ...item };
+                        batch.set(docRef, itemData);
+                    });
+                    
+                    await batch.commit();
+                    console.log("Default menu items added to Firebase");
+                }
+
+                // Check if categories exist
+                const categoriesRef = db.collection("config").doc(CATEGORIES_DOC);
+                const categoriesDoc = await categoriesRef.get();
+                if (!categoriesDoc.exists) {
+                    await categoriesRef.set({ categories: window.categories });
+                    console.log("Categories initialized in Firebase");
+                }
+
+            } catch (error) {
+                console.error("Error initializing Firebase data:", error);
+            }
+        }
+
+        // Load menu data from Firebase
+        async function loadMenuData() {
+            try {
+                const snapshot = await db.collection(MENU_ITEMS_COLLECTION).get();
+                if (snapshot.empty) {
+                    console.log("No menu items found in Firebase");
+                    return window.menuItems || [];
+                }
+                
+                const items = [];
+                snapshot.forEach(doc => {
+                    items.push({
+                        id: doc.id,
+                        ...doc.data()
+                    });
+                });
+                
+                // Sort by ID
+                return items.sort((a, b) => parseInt(a.id) - parseInt(b.id));
+            } catch (error) {
+                console.error("Error loading menu data from Firebase:", error);
+                return window.menuItems || [];
+            }
+        }
+
+        // Save menu data to Firebase
+        async function saveMenuData() {
+            try {
+                const batch = db.batch();
+                
+                currentMenuItems.forEach(item => {
+                    const docRef = db.collection(MENU_ITEMS_COLLECTION).doc(item.id.toString());
+                    const itemData = { ...item };
+                    batch.set(docRef, itemData);
+                });
+                
+                await batch.commit();
+                
+                updateStats();
+                showNotification('Changes saved successfully to cloud!', 'success');
+            } catch (error) {
+                console.error("Error saving to Firebase:", error);
+                showNotification('Error saving to cloud!', 'danger');
+            }
+        }
+
+        // Reset to original data
+        async function resetMenuData() {
+            if (confirm('Are you sure you want to reset all changes? This will revert to original menu data.')) {
+                try {
+                    // First, delete all existing menu items
+                    const snapshot = await db.collection(MENU_ITEMS_COLLECTION).get();
+                    const batch = db.batch();
+                    snapshot.forEach(doc => {
+                        batch.delete(doc.ref);
+                    });
+                    await batch.commit();
+                    
+                    // Then add original menu items
+                    const addBatch = db.batch();
+                    window.menuItems.forEach(item => {
+                        const docRef = db.collection(MENU_ITEMS_COLLECTION).doc(item.id.toString());
+                        const itemData = { ...item };
+                        addBatch.set(docRef, itemData);
+                    });
+                    await addBatch.commit();
+                    
+                    currentMenuItems = [...window.menuItems];
+                    renderCategories();
+                    showNotification('Menu reset to original state in cloud', 'info');
+                } catch (error) {
+                    console.error("Error resetting data:", error);
+                    showNotification('Error resetting data!', 'danger');
+                }
+            }
+        }
+
+        // Export to CSV
+        function exportToCSV() {
+            if (currentMenuItems.length === 0) {
+                showNotification('No data to export!', 'warning');
+                return;
+            }
+            
+            // Create CSV content
+            const headers = ['ID', 'Name', 'Price', 'Category', 'Subcategory', 'Description', 'Active', 'Recommended', 'Customizable'];
+            const csvRows = [headers.join(',')];
+            
+            currentMenuItems.forEach(item => {
+                const row = [
+                    item.id,
+                    `"${item.name}"`,
+                    item.price,
+                    item.category || '',
+                    item.subcategory || '',
+                    `"${item.description || ''}"`,
+                    item.isActive !== false ? 'Yes' : 'No',
+                    item.recommended ? 'Yes' : 'No',
+                    item.customizable ? 'Yes' : 'No'
+                ];
+                csvRows.push(row.join(','));
+            });
+            
+            const csvString = csvRows.join('\n');
+            
+            // Create download link
+            const blob = new Blob([csvString], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('hidden', '');
+            a.setAttribute('href', url);
+            a.setAttribute('download', 'menu_items_export.csv');
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            
+            showNotification('CSV exported successfully!', 'success');
+        }
+
+        // Toggle item active state
+        async function toggleItemActive(itemId) {
+            const itemIndex = currentMenuItems.findIndex(item => item.id == itemId);
+            if (itemIndex !== -1) {
+                currentMenuItems[itemIndex].isActive = !currentMenuItems[itemIndex].isActive;
+                renderCategories();
+            }
+        }
+
+        // Toggle entire category active state
+        async function toggleCategoryActive(categoryId) {
+            const categoryItems = currentMenuItems.filter(item => item.category === categoryId);
+            if (categoryItems.length === 0) return;
+            
+            // Check if all items are currently active
+            const allActive = categoryItems.every(item => item.isActive !== false);
+            const newActiveState = !allActive;
+            
+            // Update all items in the category
+            categoryItems.forEach(item => {
+                const itemIndex = currentMenuItems.findIndex(i => i.id == item.id);
+                if (itemIndex !== -1) {
+                    currentMenuItems[itemIndex].isActive = newActiveState;
+                }
+            });
+            
+            renderCategories();
+        }
+
+        // Toggle category collapse
+        function toggleCategoryCollapse(categoryId) {
+            collapsedCategories[categoryId] = !collapsedCategories[categoryId];
+            const categoryElement = document.getElementById(`category-${categoryId}`);
+            const contentElement = document.getElementById(`category-content-${categoryId}`);
+            const headerElement = document.getElementById(`category-header-${categoryId}`);
+            
+            if (collapsedCategories[categoryId]) {
+                contentElement.classList.add('collapsed');
+                headerElement.classList.add('collapsed');
+            } else {
+                contentElement.classList.remove('collapsed');
+                headerElement.classList.remove('collapsed');
+            }
+        }
+
+        // Filter and search items
+        function filterItems() {
+            filteredItems = currentMenuItems.filter(item => {
+                // Apply search filter
+                if (currentSearch) {
+                    const searchTerm = currentSearch.toLowerCase();
+                    if (!item.name.toLowerCase().includes(searchTerm) && 
+                        !item.description?.toLowerCase().includes(searchTerm) &&
+                        !item.category.toLowerCase().includes(searchTerm)) {
+                        return false;
+                    }
+                }
+                
+                // Apply type filter
+                switch(currentFilter) {
+                    case 'active':
+                        return item.isActive !== false;
+                    case 'inactive':
+                        return item.isActive === false;
+                    case 'recommended':
+                        return item.recommended === true;
+                    default:
+                        return true;
+                }
+            });
+            
+            updateStats();
+        }
+
+        // Group items by category
+        function groupItemsByCategory(items) {
+            const grouped = {};
+            
+            // Initialize with categories that have items
+            window.categories.forEach(category => {
+                const categoryItems = items.filter(item => item.category === category.id);
+                if (categoryItems.length > 0) {
+                    grouped[category.id] = {
+                        ...category,
+                        items: categoryItems,
+                        activeCount: categoryItems.filter(item => item.isActive !== false).length,
+                        totalCount: categoryItems.length
+                    };
+                }
+            });
+            
+            return grouped;
+        }
+
+        // Update statistics
+        function updateStats() {
+            const totalItems = currentMenuItems.length;
+            const activeItems = currentMenuItems.filter(item => item.isActive !== false).length;
+            const inactiveItems = currentMenuItems.filter(item => item.isActive === false).length;
+            const recommendedItems = currentMenuItems.filter(item => item.recommended === true).length;
+            
+            document.getElementById('totalItems').querySelector('.value').textContent = totalItems;
+            document.getElementById('activeItems').querySelector('.value').textContent = activeItems;
+            document.getElementById('inactiveItems').querySelector('.value').textContent = inactiveItems;
+            document.getElementById('recommendedItems').querySelector('.value').textContent = recommendedItems;
+        }
+
+        // Render categories
+        function renderCategories() {
+            filterItems();
+            const container = document.getElementById('categoriesContainer');
+            const groupedItems = groupItemsByCategory(filteredItems);
+            
+            if (Object.keys(groupedItems).length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-clipboard-list"></i>
+                        <h3>No menu items found</h3>
+                        <p>No items match your current filter or search</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            
+            // Sort categories by displayOrder
+            const sortedCategories = Object.values(groupedItems).sort((a, b) => a.displayOrder - b.displayOrder);
+            
+            sortedCategories.forEach(category => {
+                const isCollapsed = collapsedCategories[category.id] || false;
+                const isAllActive = category.items.every(item => item.isActive !== false);
+                
+                html += `
+                    <div class="category-section" id="category-${category.id}">
+                        <div class="category-header ${isCollapsed ? 'collapsed' : ''}" id="category-header-${category.id}" onclick="toggleCategoryCollapse('${category.id}')">
+                            <div class="category-info">
+                                <div class="category-name">
+                                    <i class="${category.icon} category-icon"></i>
+                                    ${category.name}
+                                </div>
+                                <div class="category-stats">
+                                    <span>${category.activeCount}/${category.totalCount} Active</span>
+                                    <span>${category.items.length} Items</span>
+                                </div>
+                            </div>
+                            <div class="category-controls">
+                                <div class="category-toggle" onclick="event.stopPropagation()">
+                                    <span class="toggle-text">${isAllActive ? 'Active' : 'Inactive'}</span>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" ${isAllActive ? 'checked' : ''} 
+                                               onchange="toggleCategoryActive('${category.id}')">
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                                <button class="action-btn" onclick="event.stopPropagation(); toggleCategoryCollapse('${category.id}')">
+                                    <i class="fas fa-${isCollapsed ? 'chevron-down' : 'chevron-up'}"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="category-content ${isCollapsed ? 'collapsed' : ''}" id="category-content-${category.id}">
+                `;
+                
+                // Group items by subcategory if they exist
+                if (category.subcategories && category.subcategories.length > 0) {
+                    category.subcategories.forEach(subcategory => {
+                        const subcategoryItems = category.items.filter(item => item.subcategory === subcategory.id);
+                        if (subcategoryItems.length > 0) {
+                            html += `<h4 style="grid-column: 1 / -1; margin: 10px 0; color: var(--text-light);">${subcategory.name}</h4>`;
+                            
+                            subcategoryItems.forEach(item => {
+                                html += createMenuItemHTML(item, category);
+                            });
+                        }
+                    });
+                    
+                    // Items without subcategory
+                    const itemsWithoutSubcategory = category.items.filter(item => !item.subcategory);
+                    if (itemsWithoutSubcategory.length > 0) {
+                        html += `<h4 style="grid-column: 1 / -1; margin: 10px 0; color: var(--text-light);">Other ${category.name}</h4>`;
+                        
+                        itemsWithoutSubcategory.forEach(item => {
+                            html += createMenuItemHTML(item, category);
+                        });
+                    }
+                } else {
+                    // No subcategories
+                    category.items.forEach(item => {
+                        html += createMenuItemHTML(item, category);
+                    });
+                }
+                
+                html += `
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        // Create menu item HTML
+        function createMenuItemHTML(item, category) {
+            return `
+                <div class="menu-item-card ${item.isActive === false ? 'inactive' : ''}">
+                    <div class="menu-item-header">
+                        <div class="menu-item-name">${item.name}</div>
+                        <div class="menu-item-price">₹ ${item.price.toFixed(2)}</div>
+                    </div>
+                    
+                    ${item.description ? `<div class="menu-item-description">${item.description}</div>` : ''}
+                    
+                    <div class="menu-item-meta">
+                        ${category.name !== item.category ? `<span class="menu-item-badge badge-category">${item.category}</span>` : ''}
+                        ${item.recommended ? `<span class="menu-item-badge badge-recommended">Recommended</span>` : ''}
+                        ${item.customizable ? `<span class="menu-item-badge badge-customizable">Customizable</span>` : ''}
+                        ${item.isActive === false ? `<span class="menu-item-badge badge-inactive">Inactive</span>` : ''}
+                    </div>
+                    
+                    <div class="menu-item-controls">
+                        <div class="item-toggle">
+                            <span style="font-size: 0.85rem; color: var(--text-light);">Status:</span>
+                            <label class="toggle-switch" style="margin-left: 10px;">
+                                <input type="checkbox" ${item.isActive !== false ? 'checked' : ''} 
+                                       onchange="toggleItemActive('${item.id}')">
+                                <span class="slider"></span>
+                            </label>
+                            <span style="margin-left: 10px; font-size: 0.85rem;">
+                                ${item.isActive !== false ? 'Active' : 'Inactive'}
+                            </span>
+                        </div>
+                        
+                        <div style="font-size: 0.85rem; color: var(--text-light);">
+                            ID: ${item.id}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Show notification
+        function showNotification(message, type = 'info') {
+            const notificationArea = document.getElementById('notificationArea');
+            
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <div class="notification-icon">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'warning' ? 'exclamation-triangle' : type === 'danger' ? 'exclamation-circle' : 'info-circle'}"></i>
+                </div>
+                <div class="notification-content">
+                    <div class="notification-title">${type.charAt(0).toUpperCase() + type.slice(1)}</div>
+                    <div class="notification-message">${message}</div>
+                </div>
+                <button class="notification-close" onclick="this.parentElement.remove()">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            
+            notificationArea.appendChild(notification);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.style.animation = 'slideOut 0.3s ease';
+                    setTimeout(() => {
+                        if (notification.parentNode) {
+                            notification.remove();
+                        }
+                    }, 300);
+                }
+            }, 5000);
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                // Initialize Firebase data
+                await initializeFirebaseData();
+                
+                // Load data from Firebase
+                currentMenuItems = await loadMenuData();
+                
+                // Set up event listeners
+                document.getElementById('saveBtn').addEventListener('click', saveMenuData);
+                document.getElementById('resetBtn').addEventListener('click', resetMenuData);
+                document.getElementById('exportBtn').addEventListener('click', exportToCSV);
+                
+                // Search functionality
+                document.getElementById('searchBox').addEventListener('input', (e) => {
+                    currentSearch = e.target.value;
+                    renderCategories();
+                });
+                
+                // Filter buttons
+                document.querySelectorAll('.filter-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                        e.target.classList.add('active');
+                        currentFilter = e.target.dataset.filter;
+                        renderCategories();
+                    });
+                });
+                
+                // Initial render
+                renderCategories();
+                
+                showNotification('Admin panel loaded successfully!', 'success');
+                
+            } catch (error) {
+                console.error("Error initializing admin panel:", error);
+                showNotification('Error loading admin panel!', 'danger');
+            }
+        });
+    </script>
+</body>
+</html>
